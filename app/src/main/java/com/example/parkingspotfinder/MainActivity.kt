@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.parkingspotfinder.navigation.Navigation
 import com.example.parkingspotfinder.ui.theme.ParkingSpotFinderTheme
 import com.google.maps.android.compose.GoogleMap
 
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ParkingSpotFinderTheme {
-            GoogleMap()
+                Navigation()
             }
         }
     }
