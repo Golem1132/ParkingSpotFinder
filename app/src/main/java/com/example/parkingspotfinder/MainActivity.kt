@@ -19,7 +19,9 @@ import com.example.parkingspotfinder.location.LocationService
 import com.example.parkingspotfinder.navigation.Navigation
 import com.example.parkingspotfinder.ui.theme.ParkingSpotFinderTheme
 import com.google.maps.android.compose.GoogleMap
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

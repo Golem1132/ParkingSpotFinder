@@ -18,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.parkingspotfinder.bottomappbar.ParkingSpotFinderBottomAppBar
+import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.location.LocationService
 import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
 import com.google.android.gms.maps.GoogleMapOptions
@@ -32,10 +34,10 @@ import com.google.maps.android.compose.*
 @Preview
 @Composable
 fun MapScreen(
+    viewModel: MapViewModel = hiltViewModel<MapViewModel>(),
     navController: NavController = rememberNavController()
 ) {
-    val viewModel = MapViewModel()
-    viewModel
+    val markersList = viewModel.markersList.collectAsState().value
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -51,7 +53,12 @@ fun MapScreen(
         ParkingSpotFinderFAB(backgroundColor = Color.Blue,
             icon = Icons.Sharp.Add,
             iconColor = Color.White) {
-
+            viewModel.insertNewMarker(
+                ParkingSpotMarker(
+                    name = "Fresh marker",
+                    latLng = LocationService.position
+                )
+            )
         }
         },
         floatingActionButtonPosition = FabPosition.Center,
@@ -63,8 +70,15 @@ fun MapScreen(
                 uiSettings = getMapUiSettings(),
                 properties = getMapProperties()
             ) {
+                markersList.forEach { marker ->
+                    Marker(
+                        state = MarkerState(marker.latLng),
+                        title = marker.name
+                    )
 
-            }
+                }
+
+                }
 
         }
 
