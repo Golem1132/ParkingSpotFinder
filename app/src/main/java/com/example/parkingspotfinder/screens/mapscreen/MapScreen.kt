@@ -11,9 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,11 +23,15 @@ import com.example.parkingspotfinder.bottomappbar.ParkingSpotFinderBottomAppBar
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.location.LocationService
 import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
@@ -38,7 +40,8 @@ fun MapScreen(
     navController: NavController = rememberNavController()
 ) {
     val markersList = viewModel.markersList.collectAsState().value
-
+    val cameraPosition = rememberCameraPositionState()
+    val scope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -68,7 +71,16 @@ fun MapScreen(
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 uiSettings = getMapUiSettings(),
-                properties = getMapProperties()
+                properties = getMapProperties(),
+                cameraPositionState = cameraPosition,
+                onMapLoaded = {
+                    scope.launch(Dispatchers.Main) {
+                        cameraPosition.animate(
+                            CameraUpdateFactory.newCameraPosition(
+                            CameraPosition.fromLatLngZoom(LocationService.position, 15f)
+                        ))
+                    }
+                }
             ) {
                 markersList.forEach { marker ->
                     Marker(
