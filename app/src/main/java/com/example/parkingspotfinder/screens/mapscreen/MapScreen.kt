@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.parkingspotfinder.bottomappbar.ParkingSpotFinderBottomAppBar
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.location.LocationService
+import com.example.parkingspotfinder.widgets.InfoWindow
 import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
@@ -67,7 +68,7 @@ fun MapScreen(
         floatingActionButtonPosition = FabPosition.Center,
         isFloatingActionButtonDocked = true
     ) { it
-        Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 uiSettings = getMapUiSettings(),
@@ -83,10 +84,14 @@ fun MapScreen(
                 }
             ) {
                 markersList.forEach { marker ->
-                    Marker(
+                    MarkerInfoWindow(
                         state = MarkerState(marker.latLng),
                         title = marker.name
-                    )
+                    ){
+                        InfoWindow(
+                            title = marker.name
+                        )
+                    }
 
                 }
 
