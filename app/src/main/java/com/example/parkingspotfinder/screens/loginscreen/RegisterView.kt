@@ -1,4 +1,4 @@
-package com.example.parkingspotfinder.screens.registerscreen
+package com.example.parkingspotfinder.screens.loginscreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,11 +31,12 @@ import com.example.parkingspotfinder.widgets.InputField
 import com.example.parkingspotfinder.widgets.SubmitButton
 
 @OptIn(ExperimentalComposeUiApi::class)
-@Preview
 @Composable
-fun RegisterScreen() {
+fun RegisterView(
+    onSubmit: (String, String, String) -> Unit
+) {
     val emailRegex = Regex("\\w+@\\w*\\.\\w+")
-    val loginState = rememberSaveable {
+    val fullNameState = rememberSaveable {
         mutableStateOf("")
     }
     val passwordState = rememberSaveable {
@@ -47,8 +48,8 @@ fun RegisterScreen() {
     val emailState = rememberSaveable {
         mutableStateOf("")
     }
-    val buttonEnabled = remember(emailState.value, loginState.value, passwordState.value, repeatPasswordState.value) {
-        mutableStateOf(loginState.value.length >= 3 && passwordState.value.length >= 8 && passwordState.value == repeatPasswordState.value && emailRegex.matches(emailState.value))
+    val buttonEnabled = remember(emailState.value, fullNameState.value, passwordState.value, repeatPasswordState.value) {
+        mutableStateOf(fullNameState.value.length >= 3 && passwordState.value.length >= 8 && passwordState.value == repeatPasswordState.value && emailRegex.matches(emailState.value))
     }
     val keyboard = LocalSoftwareKeyboardController.current
     Column(
@@ -76,11 +77,11 @@ fun RegisterScreen() {
         }
 
         InputField(
-            value = loginState,
+            value = fullNameState,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             visualTransformation = VisualTransformation.None
         ) {
-            Text(text = "Login")
+            Text(text = "Full name")
         }
         InputField(
             value = passwordState,
@@ -105,7 +106,7 @@ fun RegisterScreen() {
             text = "Register",
             enabled = buttonEnabled.value
         ) {
-
+            onSubmit(emailState.value, passwordState.value, fullNameState.value)
         }
 
     }

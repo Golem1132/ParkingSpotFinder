@@ -8,7 +8,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.parkingspotfinder.screens.loginscreen.LoginScreen
 import com.example.parkingspotfinder.screens.mapscreen.MapScreen
 import com.example.parkingspotfinder.screens.mapscreen.MapViewModel
-import com.example.parkingspotfinder.screens.registerscreen.RegisterScreen
 
 @Composable
 fun Navigation() {
@@ -23,9 +22,6 @@ fun Navigation() {
             LoginScreen(navController = navController)
         }
 
-        composable(route = Screens.RegisterScreen.route) {
-        RegisterScreen()
-        }
 
     }
 }
