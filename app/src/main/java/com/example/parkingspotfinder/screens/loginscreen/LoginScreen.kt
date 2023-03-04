@@ -54,8 +54,8 @@ fun LoginScreen(
                 onClick = {
                     inLoginMode = !inLoginMode
                 }
-            ) { login, password ->
-                loginViewModel.logIn(login, password) {
+            ) { email, password ->
+                loginViewModel.logIn(email, password) {
                     navController.navigate(Screens.MapScreen.route)
                 }
             }
@@ -64,7 +64,9 @@ fun LoginScreen(
         else {
             RegisterView() { email, password, fullName ->
                 loginViewModel.registerNewUser(email, password, fullName) {
-
+                    loginViewModel.logIn(email, password) {
+                        navController.navigate(Screens.MapScreen.route)
+                    }
                 }
             }
         }

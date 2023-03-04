@@ -35,7 +35,7 @@ fun LoginView(
     onClick: () -> Unit,
     onSubmit: (String, String) -> Unit
 ) {
-
+    val emailRegex = Regex("\\w+@\\w*\\.\\w+")
     val loginState = rememberSaveable {
         mutableStateOf("")
     }
@@ -43,7 +43,7 @@ fun LoginView(
         mutableStateOf("")
     }
     val buttonEnabled = remember(loginState.value, passwordState.value) {
-        mutableStateOf(loginState.value.length >= 3 && passwordState.value.length >= 8)
+        mutableStateOf(emailRegex.matches(loginState.value) && passwordState.value.length >= 8)
     }
     val keyboard = LocalSoftwareKeyboardController.current
     Column(
@@ -85,7 +85,7 @@ fun LoginView(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             visualTransformation = VisualTransformation.None
         ) {
-            Text(text = "Login")
+            Text(text = "E-mail")
         }
         InputField(
             value = passwordState,
