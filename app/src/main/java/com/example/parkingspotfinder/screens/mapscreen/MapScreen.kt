@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.parkingspotfinder.bottomappbar.ParkingSpotFinderBottomAppBar
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.location.LocationService
+import com.example.parkingspotfinder.topappbar.ParkingSpotFinderTopAppBar
 import com.example.parkingspotfinder.widgets.InfoWindow
 import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -45,18 +46,11 @@ fun MapScreen(
     val scope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            ParkingSpotFinderBottomAppBar(
-                navController = navController,
-                backgroundColor = Color.DarkGray,
-                contentColor = Color.White,
-                cutoutShape = CircleShape
-            )
+        topBar = {
+                 ParkingSpotFinderTopAppBar(false)
         },
         floatingActionButton = {
-        ParkingSpotFinderFAB(backgroundColor = Color.Blue,
-            icon = Icons.Sharp.Add,
-            iconColor = Color.White) {
+        ParkingSpotFinderFAB(icon = Icons.Sharp.Add) {
             viewModel.insertNewMarker(
                 ParkingSpotMarker(
                     name = "Fresh marker",
@@ -65,8 +59,7 @@ fun MapScreen(
             )
         }
         },
-        floatingActionButtonPosition = FabPosition.Center,
-        isFloatingActionButtonDocked = true
+        floatingActionButtonPosition = FabPosition.Center
     ) { it
             Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(

@@ -40,7 +40,7 @@ fun LoginScreen(
     }
     Scaffold(topBar = {
         if (!inLoginMode)
-            ParkingSpotFinderTopAppBar(){
+            ParkingSpotFinderTopAppBar(true){
                 inLoginMode = true
             }
         else

@@ -15,16 +15,11 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ParkingSpotFinderFAB(
-    backgroundColor: Color,
     icon: ImageVector,
-    iconColor: Color,
     onClick:() -> Unit
 ){
     FloatingActionButton(
-        backgroundColor = backgroundColor,
         onClick = { onClick.invoke() }) {
-        Image(imageVector = icon, contentDescription = "Add marker",
-        colorFilter = ColorFilter.tint(iconColor))
-
+        Image(imageVector = icon, contentDescription = "Add marker")
     }
 }

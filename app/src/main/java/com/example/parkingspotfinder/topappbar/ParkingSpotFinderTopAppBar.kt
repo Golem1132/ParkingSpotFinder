@@ -5,17 +5,22 @@ import androidx.compose.material.Icon
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ParkingSpotFinderTopAppBar(
-    onIconClick: () -> Unit
+    isNavIcon: Boolean,
+    onIconClick: () -> Unit = {}
 ) {
     TopAppBar {
         Icon(modifier = Modifier.clickable { onIconClick() },
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = if(isNavIcon)
+                Icons.Default.ArrowBack
+            else
+                Icons.Default.Menu,
             contentDescription = "Go back")
     }
 }
