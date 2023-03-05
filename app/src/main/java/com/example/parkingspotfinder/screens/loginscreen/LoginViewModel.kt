@@ -2,6 +2,7 @@ package com.example.parkingspotfinder.screens.loginscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.parkingspotfinder.model.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -27,9 +28,11 @@ class LoginViewModel: ViewModel() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 if(it.isSuccessful) {
-                    val userInfo = mutableMapOf<String, String>()
-                    userInfo["userId"] = auth.currentUser?.uid.toString()
-                    userInfo["fullName"] = fullName
+                    val userInfo = UserInfo(
+                        userId = auth.currentUser?.uid.toString(),
+                        email = email,
+                        fullName = fullName
+                    ).toMap()
                     firestore.collection("users").add(userInfo)
                     onSuccess()
 

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +22,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.parkingspotfinder.bottomappbar.ParkingSpotFinderBottomAppBar
 import com.example.parkingspotfinder.data.ParkingSpotMarker
+import com.example.parkingspotfinder.drawer.ParkingSpotFinderDrawer
 import com.example.parkingspotfinder.location.LocationService
+import com.example.parkingspotfinder.navigation.Screens
 import com.example.parkingspotfinder.topappbar.ParkingSpotFinderTopAppBar
 import com.example.parkingspotfinder.widgets.InfoWindow
 import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
@@ -30,25 +33,45 @@ import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.firebase.auth.FirebaseAuth
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Preview
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel = hiltViewModel<MapViewModel>(),
-    navController: NavController = rememberNavController()
+    viewModel: MapViewModel,
+    navController: NavController
 ) {
     val markersList = viewModel.markersList.collectAsState().value
     val cameraPosition = rememberCameraPositionState()
     val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-                 ParkingSpotFinderTopAppBar(false)
+                 ParkingSpotFinderTopAppBar(false) {
+                     if(scaffoldState.drawerState.isOpen) {
+                         scope.launch {
+                             scaffoldState.drawerState.close()
+                         }
+                     } else {
+                         scope.launch {
+                             scaffoldState.drawerState.open()
+                         }
+                     }
+                 }
         },
+        drawerContent = {
+          ParkingSpotFinderDrawer() {
+              FirebaseAuth.getInstance().signOut().run {
+                  navController.navigate(Screens.LoginScreen.route)
+              }
+          }
+        },
+        drawerGesturesEnabled = false,
+        scaffoldState = scaffoldState,
         floatingActionButton = {
         ParkingSpotFinderFAB(icon = Icons.Sharp.Add) {
             viewModel.insertNewMarker(
