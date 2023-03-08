@@ -8,7 +8,9 @@ import com.google.android.gms.maps.model.LatLng
 data class ParkingSpotMarker(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String = "My marker",
-    val latLng: LatLng
-
+    val name: String,
+    val description: String,
+    val latLng: LatLng,
+    val type: ParkingSpotType,
+    val uploadTime: Long,
 )

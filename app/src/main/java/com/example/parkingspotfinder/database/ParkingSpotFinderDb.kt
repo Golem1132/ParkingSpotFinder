@@ -1,16 +1,15 @@
 package com.example.parkingspotfinder.database
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 
 @Database(entities = [
 ParkingSpotMarker::class
 ],
     version = 1,
-    exportSchema = false
+    exportSchema = true,
+    autoMigrations = [
+    ]
 )
 @TypeConverters(Converters::class)
 abstract class ParkingSpotFinderDb: RoomDatabase() {

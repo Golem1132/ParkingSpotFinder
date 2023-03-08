@@ -10,4 +10,6 @@ class DbRepository @Inject constructor(private val markersDao: MarkersDao) {
     fun getAllMarkers(): Flow<List<ParkingSpotMarker>> = markersDao.getAllMarkers()
 
     suspend fun insertNewMarker(marker: ParkingSpotMarker) = markersDao.insertNewMarker(marker)
+
+    suspend fun deleteMarker(marker: ParkingSpotMarker) = markersDao.deleteMarker(marker)
 }
