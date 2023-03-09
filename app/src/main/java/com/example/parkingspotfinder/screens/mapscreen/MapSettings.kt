@@ -6,7 +6,7 @@ import com.google.maps.android.compose.MapUiSettings
 fun getMapUiSettings(): MapUiSettings = MapUiSettings(
     compassEnabled = true,
     indoorLevelPickerEnabled = false,
-    mapToolbarEnabled = true,
+    mapToolbarEnabled = false,
     myLocationButtonEnabled = true,
     rotationGesturesEnabled = true,
     scrollGesturesEnabled = true,

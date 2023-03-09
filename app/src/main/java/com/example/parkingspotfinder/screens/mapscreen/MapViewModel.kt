@@ -15,7 +15,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(private val repository: DbRepository): ViewModel() {
     private val _markersList = MutableStateFlow<List<ParkingSpotMarker>>(emptyList())
-    var selectedType = MutableStateFlow<String>(ParkingSpotType.MYMARKER.name)
     val markersList = _markersList
 
     init {

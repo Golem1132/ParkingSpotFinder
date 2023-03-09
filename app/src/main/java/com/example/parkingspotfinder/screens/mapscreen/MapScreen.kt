@@ -34,6 +34,7 @@ import com.example.parkingspotfinder.widgets.InputField
 import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,27 +50,16 @@ fun MapScreen(
     var showDialog by remember {
         mutableStateOf(false)
     }
+    var pos = LatLng(0.0,0.0)
     val cameraPosition = rememberCameraPositionState()
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            ParkingSpotFinderTopAppBar(false) {
-                if (scaffoldState.drawerState.isOpen) {
-                    scope.launch {
-                        scaffoldState.drawerState.close()
-                    }
-                } else {
-                    scope.launch {
-                        scaffoldState.drawerState.open()
-                    }
-                }
-            }
-        },
         scaffoldState = scaffoldState,
         floatingActionButton = {
             ParkingSpotFinderFAB(icon = Icons.Sharp.Add) {
+                pos = LocationService.position
                 showDialog = true
             }
         },
@@ -90,6 +80,10 @@ fun MapScreen(
                             )
                         )
                     }
+                },
+                onMapLongClick = {
+                    pos = it
+                    showDialog = !showDialog
                 }
             ) {
                 markersList.forEach { marker ->
@@ -97,16 +91,10 @@ fun MapScreen(
                         state = MarkerState(marker.latLng),
                         title = marker.name
                     ) {
-                        InfoWindow(
-                            title = marker.name
-                        )
+                        InfoWindow(marker)
                     }
-
                 }
-
             }
-
-
         }
 
         if (showDialog) {
@@ -119,7 +107,7 @@ fun MapScreen(
                     ParkingSpotMarker(
                         name = name,
                         description = description,
-                        latLng = LocationService.position,
+                        latLng = pos,
                         type = ParkingSpotType.valueOf(type),
                         uploadTime = Date.from(Instant.now()).time
                     )
@@ -181,9 +169,6 @@ fun ShowDialog(
         var type by remember {
             mutableStateOf("")
         }
-        var checked by remember {
-            mutableStateOf(false)
-        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -222,15 +207,10 @@ fun ShowDialog(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.End
             ) {
-                CheckboxWithLabel(checked = checked, onCheckedChanged = {
-                    checked = it
-                }) {
-                    Text("Make public?")
-                }
                 Button(onClick = {
-                    if (name.value.isNotBlank() || type.isNotBlank() && type != ParkingSpotType.MYMARKER.name)
+                    if (name.value.isNotBlank() || type.isNotBlank())
                         onSubmit(name.value, description.value, type)
 
                 }) {
