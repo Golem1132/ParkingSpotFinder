@@ -1,5 +1,6 @@
 package com.example.parkingspotfinder.screens.mapscreen
 
+import android.location.Address
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,27 +21,23 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.data.ParkingSpotType
 import com.example.parkingspotfinder.location.LocationService
-import com.example.parkingspotfinder.topappbar.ParkingSpotFinderTopAppBar
-import com.example.parkingspotfinder.widgets.DraggableDrawer
-import com.example.parkingspotfinder.widgets.InfoWindow
-import com.example.parkingspotfinder.widgets.InputField
-import com.example.parkingspotfinder.widgets.ParkingSpotFinderFAB
+import com.example.parkingspotfinder.widgets.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.PointOfInterest
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
@@ -54,6 +51,14 @@ fun MapScreen(
     val cameraPosition = rememberCameraPositionState()
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
+    var poiInfoWindowState by remember {
+        mutableStateOf(false)
+    }
+    var poiState = rememberMarkerState()
+    val addressState = remember<MutableState<Address?>> {
+        mutableStateOf(null)
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState,
@@ -65,13 +70,23 @@ fun MapScreen(
         },
         floatingActionButtonPosition = FabPosition.End
     ) {
-        it
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 uiSettings = getMapUiSettings(),
                 properties = getMapProperties(),
                 cameraPositionState = cameraPosition,
+                onMapClick = { poi ->
+                    viewModel.getFullAddress(poi).getCompleted().let { address ->
+                        if (address != null) {
+                            poiInfoWindowState = true
+                            addressState.value = address
+                            poiState.position = poi
+                        }
+                    }
+                },
                 onMapLoaded = {
                     scope.launch(Dispatchers.Main) {
                         cameraPosition.animate(
@@ -94,6 +109,11 @@ fun MapScreen(
                         InfoWindow(marker)
                     }
                 }
+
+                if(poiInfoWindowState)
+                    Marker(
+                        state = poiState
+                    )
             }
         }
 
@@ -117,9 +137,16 @@ fun MapScreen(
         } else {
             Box {}
         }
+
+        if(poiInfoWindowState)
+            PoiInfoWindow(address = addressState.value) {
+                poiInfoWindowState = false
+            }
+        else Box{}
     }
     DraggableDrawer(list = markersList,
         buttonsRow = {
+            Spacer(modifier = Modifier.width(10.dp))
             Button(
                 onClick = {
                     scope.launch(Dispatchers.Main) {
@@ -134,6 +161,7 @@ fun MapScreen(
             ) {
                 Image(imageVector = Icons.Default.Search, contentDescription = "ZoomTo")
             }
+            Spacer(modifier = Modifier.width(10.dp))
             Button(
                 onClick = {
                           viewModel.deleteMarker(it)
@@ -142,7 +170,7 @@ fun MapScreen(
             ) {
                 Image(imageVector = Icons.Default.Delete, contentDescription = "Delete")
             }
-
+            Spacer(modifier = Modifier.width(10.dp))
         }) {
         Column(modifier = Modifier.padding(horizontal = 10.dp)) {
             Text(text = it.name)

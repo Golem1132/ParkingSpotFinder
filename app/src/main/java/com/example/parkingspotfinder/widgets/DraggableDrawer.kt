@@ -65,7 +65,7 @@ fun <T>SwipeableRow(
                 .fillMaxWidth(),
                 color = Color.White) {
                 Row(verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly) {
+                    horizontalArrangement = Arrangement.End) {
                     buttonsRow(this, item)
                 }
 

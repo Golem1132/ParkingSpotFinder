@@ -1,6 +1,7 @@
 package com.example.parkingspotfinder.di
 
 import android.content.Context
+import android.location.Geocoder
 import androidx.room.Database
 import androidx.room.Room
 import com.example.parkingspotfinder.ParkingSpotFinderApp
@@ -49,5 +50,9 @@ class ParkingSpotFinderModule {
         context,
         client
     )
+
+    @Provides
+    @Singleton
+    fun provideGeocoder(@ApplicationContext context: Context): Geocoder = Geocoder(context)
 
 }
