@@ -3,6 +3,7 @@ package com.example.parkingspotfinder.location
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import androidx.compose.runtime.mutableStateOf
 import com.example.parkingspotfinder.ParkingSpotFinderApp
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
@@ -21,6 +22,7 @@ class LocationService: Service() {
 
     @Inject lateinit var locationClient: LocationClient
     companion object {
+        var isPermissionGranted = mutableStateOf(false)
         var position = LatLng(0.0, 0.0)
     }
         private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -39,6 +41,8 @@ class LocationService: Service() {
 
             }.launchIn(serviceScope)
 
+        isPermissionGranted.value = true
+
     }
 
 
@@ -48,6 +52,7 @@ class LocationService: Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        isPermissionGranted.value = false
         stopSelf()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.parkingspotfinder.screens.mapscreen
 
+import android.content.Context
 import android.location.Address
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.data.ParkingSpotType
+import com.example.parkingspotfinder.extensions.checkLocationPermission
 import com.example.parkingspotfinder.location.LocationService
 import com.example.parkingspotfinder.widgets.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -41,20 +43,20 @@ import java.util.*
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navController: NavController
+    context: Context
 ) {
     val markersList = viewModel.markersList.collectAsState().value
     var showDialog by remember {
         mutableStateOf(false)
     }
-    var pos = LatLng(0.0,0.0)
+    var pos = LatLng(0.0, 0.0)
     val cameraPosition = rememberCameraPositionState()
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     var poiInfoWindowState by remember {
         mutableStateOf(false)
     }
-    var poiState = rememberMarkerState()
+    val poiState = rememberMarkerState()
     val addressState = remember<MutableState<Address?>> {
         mutableStateOf(null)
     }
@@ -64,19 +66,25 @@ fun MapScreen(
         scaffoldState = scaffoldState,
         floatingActionButton = {
             ParkingSpotFinderFAB(icon = Icons.Sharp.Add) {
-                pos = LocationService.position
-                showDialog = true
+                if (LocationService.isPermissionGranted.value) {
+                    pos = LocationService.position
+                    showDialog = true
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.End
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(it)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 uiSettings = getMapUiSettings(),
-                properties = getMapProperties(),
+                properties = MapProperties(
+                    isMyLocationEnabled = LocationService.isPermissionGranted.value
+                ),
                 cameraPositionState = cameraPosition,
                 onMapClick = { poi ->
                     viewModel.getFullAddress(poi).getCompleted().let { address ->
@@ -88,13 +96,14 @@ fun MapScreen(
                     }
                 },
                 onMapLoaded = {
-                    scope.launch(Dispatchers.Main) {
-                        cameraPosition.animate(
-                            CameraUpdateFactory.newCameraPosition(
-                                CameraPosition.fromLatLngZoom(LocationService.position, 15f)
+                    if (LocationService.isPermissionGranted.value)
+                        scope.launch(Dispatchers.Main) {
+                            cameraPosition.animate(
+                                CameraUpdateFactory.newCameraPosition(
+                                    CameraPosition.fromLatLngZoom(LocationService.position, 15f)
+                                )
                             )
-                        )
-                    }
+                        }
                 },
                 onMapLongClick = {
                     pos = it
@@ -110,7 +119,7 @@ fun MapScreen(
                     }
                 }
 
-                if(poiInfoWindowState)
+                if (poiInfoWindowState)
                     Marker(
                         state = poiState
                     )
@@ -138,11 +147,11 @@ fun MapScreen(
             Box {}
         }
 
-        if(poiInfoWindowState)
+        if (poiInfoWindowState)
             PoiInfoWindow(address = addressState.value) {
                 poiInfoWindowState = false
             }
-        else Box{}
+        else Box {}
     }
     DraggableDrawer(list = markersList,
         buttonsRow = {
@@ -164,7 +173,7 @@ fun MapScreen(
             Spacer(modifier = Modifier.width(10.dp))
             Button(
                 onClick = {
-                          viewModel.deleteMarker(it)
+                    viewModel.deleteMarker(it)
                 },
                 shape = CircleShape
             ) {
