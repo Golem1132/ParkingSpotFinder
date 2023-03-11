@@ -15,15 +15,19 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.parkingspotfinder.R
 import com.example.parkingspotfinder.data.ParkingSpotMarker
 import com.example.parkingspotfinder.data.ParkingSpotType
 import com.example.parkingspotfinder.extensions.checkLocationPermission
@@ -46,7 +50,16 @@ fun MapScreen(
     viewModel: MapViewModel,
     context: Context
 ) {
-    val markersList = viewModel.markersList.collectAsState().value
+    var filterState by remember {
+        mutableStateOf(0)
+    }
+    val markersList = viewModel.markersList.collectAsState().value.filter {
+        when(filterState) {
+            1 -> it.type.name == ParkingSpotType.CARS.name
+            2 -> it.type.name == ParkingSpotType.BIKES.name
+            else -> it.type.name == it.type.name
+        }
+    }
     var showDialog by remember {
         mutableStateOf(false)
     }
@@ -129,6 +142,24 @@ fun MapScreen(
                     )
             }
         }
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(1.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Bottom) {
+            Button(onClick = {
+                             filterState += 1
+                if(filterState > 2) filterState = 0
+            }, shape = CircleShape) {
+                val painter = when (filterState) {
+                    1 -> painterResource(id = R.drawable.directions_car_48px)
+                    2 -> painterResource(id = R.drawable.pedal_bike_48px)
+                    else -> painterResource(id = R.drawable.done_all_48px)
+                }
+                    Image(painter = painter, contentDescription = "Filter options")
+
+            }
+        }
 
         if (showDialog) {
             ShowDialog(
@@ -190,7 +221,9 @@ fun MapScreen(
             }
             Spacer(modifier = Modifier.width(10.dp))
         }) {
-        Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+        Column(modifier = Modifier.shadow(2.dp)
+            .padding(horizontal = 10.dp)
+            ) {
             Text(text = it.name)
             Text(text = it.description)
             Text(text = Date(it.uploadTime).toString())

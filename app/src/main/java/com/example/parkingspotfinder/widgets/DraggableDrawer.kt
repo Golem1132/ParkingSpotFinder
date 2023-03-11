@@ -99,7 +99,7 @@ fun <T>SwipeableRow(
             Surface(modifier = Modifier
                 .wrapContentHeight()
                 .fillMaxWidth()
-                .shadow(1.dp),
+                .shadow(2.dp),
                 color = Color.White) {
                 itemView(item)
             }
