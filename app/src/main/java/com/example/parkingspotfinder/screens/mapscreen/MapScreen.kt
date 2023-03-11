@@ -137,7 +137,7 @@ fun MapScreen(
                 }
             ) { name, description, type, error ->
                 if (error) {
-                Toast.makeText(context, "Add more information", Toast.LENGTH_SHORT)
+                Toast.makeText(context, "Add more information", Toast.LENGTH_SHORT).show()
                 }
                     else {
                     viewModel.insertNewMarker(

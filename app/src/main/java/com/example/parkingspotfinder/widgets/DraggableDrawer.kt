@@ -98,7 +98,8 @@ fun <T>SwipeableRow(
             contentAlignment = Alignment.CenterStart) {
             Surface(modifier = Modifier
                 .wrapContentHeight()
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .shadow(1.dp),
                 color = Color.White) {
                 itemView(item)
             }

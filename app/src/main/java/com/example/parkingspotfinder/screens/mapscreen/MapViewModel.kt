@@ -22,9 +22,7 @@ class MapViewModel @Inject constructor(private val repository: DbRepository, pri
         viewModelScope.launch(Dispatchers.IO) {
                     repository.getAllMarkers().distinctUntilChanged()
                         .collect() { markers ->
-                            if (markers.isNotEmpty()) {
                                 _markersList.value = markers
-                            }
                         }
         }
 
