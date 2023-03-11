@@ -2,6 +2,7 @@ package com.example.parkingspotfinder.screens.mapscreen
 
 import android.content.Context
 import android.location.Address
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -93,6 +94,9 @@ fun MapScreen(
                             addressState.value = address
                             poiState.position = poi
                         }
+                        else {
+                            Toast.makeText(context, "Can't find the address", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 },
                 onMapLoaded = {
@@ -131,17 +135,22 @@ fun MapScreen(
                 onDismiss = {
                     showDialog = !showDialog
                 }
-            ) { name, description, type ->
-                viewModel.insertNewMarker(
-                    ParkingSpotMarker(
-                        name = name,
-                        description = description,
-                        latLng = pos,
-                        type = ParkingSpotType.valueOf(type),
-                        uploadTime = Date.from(Instant.now()).time
+            ) { name, description, type, error ->
+                if (error) {
+                Toast.makeText(context, "Add more information", Toast.LENGTH_SHORT)
+                }
+                    else {
+                    viewModel.insertNewMarker(
+                        ParkingSpotMarker(
+                            name = name,
+                            description = description,
+                            latLng = pos,
+                            type = ParkingSpotType.valueOf(type),
+                            uploadTime = Date.from(Instant.now()).time
+                        )
                     )
-                )
-                showDialog = !showDialog
+                    showDialog = !showDialog
+                }
             }
         } else {
             Box {}
@@ -190,11 +199,11 @@ fun MapScreen(
 
 }
 
-@Preview
+
 @Composable
 fun ShowDialog(
-    onDismiss: () -> Unit = {},
-    onSubmit: (String, String, String) -> Unit = { _, _, _ -> }
+    onDismiss: () -> Unit,
+    onSubmit: (String, String, String, Boolean) -> Unit
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
         val name = remember {
@@ -248,7 +257,10 @@ fun ShowDialog(
             ) {
                 Button(onClick = {
                     if (name.value.isNotBlank() || type.isNotBlank())
-                        onSubmit(name.value, description.value, type)
+                        onSubmit(name.value, description.value, type,false)
+                    else {
+                        onSubmit("","","", true)
+                    }
 
                 }) {
                     Text(text = "Create")
